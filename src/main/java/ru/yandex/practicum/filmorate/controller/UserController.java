@@ -3,13 +3,9 @@ package ru.yandex.practicum.filmorate.controller;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exeption.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
