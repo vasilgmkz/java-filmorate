@@ -17,7 +17,7 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
     private final Map<Long, User> users = new HashMap<>();
-    private final static Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(UserController.class);
+    private static final Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(UserController.class);
 
     @GetMapping
     public Collection<User> findAll() {
