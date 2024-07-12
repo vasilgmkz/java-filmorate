@@ -27,6 +27,37 @@ public class UserController {
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         log.setLevel(Level.INFO);
+        userValidation(user);
+        user.setId(getNextId());
+        users.put(user.getId(), user);
+        log.info("Пользователь " + user.getName() + " успешно добавлен");
+        return user;
+    }
+
+    @PutMapping
+    public User update(@RequestBody User user) {
+        log.setLevel(Level.INFO);
+        if (users.containsKey(user.getId())) {
+            userValidation(user);
+            users.put(user.getId(), user);
+            log.info("Пользователь " + user.getName() + " успешно обновлен");
+            return user;
+        }
+        log.warn("Пользователь с id " + user.getId() + " не найден");
+        throw new ValidationException("Пользователь с id " + user.getId() + " не найден");
+    }
+
+    private long getNextId() {
+        long currentMaxId = users.keySet()
+                .stream()
+                .mapToLong(id -> id)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
+    }
+
+    private void userValidation(User user) {
+        log.setLevel(Level.WARN);
         if (user.getEmail().isBlank() || !(user.getEmail().contains("@"))) {
             log.warn("Электронная почта не может быть пустой и должна содержать символ @");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
@@ -43,46 +74,5 @@ public class UserController {
             log.warn("Дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
-        user.setId(getNextId());
-        users.put(user.getId(), user);
-        log.info("Пользователь успешно добавлен");
-        return user;
-    }
-
-    @PutMapping
-    public User update(@RequestBody User user) {
-        log.setLevel(Level.INFO);
-        if (users.containsKey(user.getId())) {
-            if (user.getEmail().isBlank() || !(user.getEmail().contains("@"))) {
-                log.warn("Электронная почта не может быть пустой и должна содержать символ @");
-                throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-            }
-            if (user.getLogin().isBlank() || (user.getLogin().contains(" "))) {
-                log.warn("Логин не может быть пустым и содержать пробелы");
-                throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-            }
-            if (user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-            LocalDate nowLocalDate = LocalDate.now();
-            if (user.getBirthday().isAfter(nowLocalDate)) {
-                log.warn("Дата рождения не может быть в будущем");
-                throw new ValidationException("Дата рождения не может быть в будущем");
-            }
-            users.put(user.getId(), user);
-            log.info("Пользователь успешно обновлен");
-            return user;
-        }
-        log.warn("Пользователь с указанным id не найден");
-        throw new ValidationException("Пользователь с указанным id не найден");
-    }
-
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
     }
 }
