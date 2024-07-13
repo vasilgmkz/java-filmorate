@@ -4,6 +4,8 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import jakarta.validation.Valid;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -35,7 +37,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@RequestBody User user) {
+    public User update(@Valid @RequestBody User user) {
         log.setLevel(Level.INFO);
         if (users.containsKey(user.getId())) {
             userValidation(user);
@@ -44,7 +46,7 @@ public class UserController {
             return user;
         }
         log.warn("Пользователь с id " + user.getId() + " не найден");
-        throw new ValidationException("Пользователь с id " + user.getId() + " не найден");
+        throw new ValidationException("Пользователь с id " + user.getId() + " не найден", "id");
     }
 
     private long getNextId() {
@@ -58,21 +60,12 @@ public class UserController {
 
     private void userValidation(User user) {
         log.setLevel(Level.WARN);
-        if (user.getEmail().isBlank() || !(user.getEmail().contains("@"))) {
-            log.warn("Электронная почта не может быть пустой и должна содержать символ @");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }
-        if (user.getLogin().isBlank() || (user.getLogin().contains(" "))) {
-            log.warn("Логин не может быть пустым и содержать пробелы");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
+        if ((user.getLogin().contains(" "))) {
+            log.warn("Логин не может содержать пробелы");
+            throw new ValidationException("Логин не может содержать пробелы", "login");
         }
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
-        }
-        LocalDate nowLocalDate = LocalDate.now();
-        if (user.getBirthday().isAfter(nowLocalDate)) {
-            log.warn("Дата рождения не может быть в будущем");
-            throw new ValidationException("Дата рождения не может быть в будущем");
         }
     }
 }

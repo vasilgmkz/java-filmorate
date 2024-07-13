@@ -2,7 +2,11 @@ package ru.yandex.practicum.filmorate.controller;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import jakarta.validation.Valid;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -25,7 +29,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film create(@RequestBody Film film) {
+    public Film create(@Valid @RequestBody Film film) {
         log.setLevel(Level.INFO);
         filmValidation(film);
         film.setId(getNextId());
@@ -35,7 +39,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film update(@RequestBody Film film) {
+    public Film update(@Valid @RequestBody Film film) {
         log.setLevel(Level.INFO);
         if (films.containsKey(film.getId())) {
             filmValidation(film);
@@ -44,7 +48,7 @@ public class FilmController {
             return film;
         }
         log.warn("Фильм с id " + film.getId() + " не найден");
-        throw new ValidationException("Фильм с id " + film.getId() + " не найден");
+        throw new ValidationException("Фильм с id " + film.getId() + " не найден", "id");
     }
 
     private long getNextId() {
@@ -58,21 +62,13 @@ public class FilmController {
 
     private void filmValidation(Film film) {
         log.setLevel(Level.WARN);
-        if (film.getName().isBlank()) {
-            log.warn("Название не может быть пустым");
-            throw new ValidationException("Название не может быть пустым");
-        }
         if (film.getDescription().length() >= 200) {
             log.warn("Максимальная длина описания — 200 символов");
-            throw new ValidationException("Максимальная длина описания — 200 символов");
+            throw new ValidationException("Максимальная длина описания — 200 символов", "duration");
         }
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.warn("Дата релиза — не раньше 28 декабря 1895 года");
-            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
-        }
-        if (film.getDuration() <= 0) {
-            log.warn("Продолжительность фильма должна быть положительным числом");
-            throw new ValidationException("Продолжительность фильма должна быть положительным числом");
+            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года", "releaseDate");
         }
     }
 }
