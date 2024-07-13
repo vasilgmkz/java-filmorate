@@ -59,10 +59,6 @@ public class FilmController {
 
     private void filmValidation(Film film) {
         log.setLevel(Level.WARN);
-        if (film.getDescription().length() >= 200) {
-            log.warn("Максимальная длина описания — 200 символов");
-            throw new ValidationException("Максимальная длина описания — 200 символов", "duration");
-        }
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.warn("Дата релиза — не раньше 28 декабря 1895 года");
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года", "releaseDate");
