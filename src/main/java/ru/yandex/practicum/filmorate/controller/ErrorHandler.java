@@ -23,6 +23,7 @@ public class ErrorHandler {
         log.warn("ValidationException");
         return new ErrorResponse(e.getMessage());
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -30,16 +31,18 @@ public class ErrorHandler {
         log.warn("ValidationException", e);
         return new ErrorResponse("Ошибка валидации передаваемых данных");
     }
+
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ErrorResponse notFoundException (NotFoundException e) {
-        return new ErrorResponse (e.getMessage());
+    public ErrorResponse notFoundException(NotFoundException e) {
+        return new ErrorResponse(e.getMessage());
     }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ErrorResponse handleException (final Exception e) {
+    public ErrorResponse handleException(final Exception e) {
         log.warn("Error", e);
         return new ErrorResponse(e.getMessage());
     }

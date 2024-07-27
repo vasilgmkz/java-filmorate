@@ -14,6 +14,7 @@ public class ValidateService {
             throw new ValidationException("Ошибка валидации. Дата релиза — не раньше 28 декабря 1895 года");
         }
     }
+
     public void userValidation(User user) {
         if ((user.getLogin().contains(" "))) {
             throw new ValidationException("Ошибка валидации. Логин не может содержать пробелы");
