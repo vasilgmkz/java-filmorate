@@ -3,15 +3,18 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import lombok.Data;
-
+import lombok.*;
 import java.time.LocalDate;
+
 
 /**
  * Film.
  */
-@Data
+
+
+@Getter
+@Setter
+@AllArgsConstructor
 @Builder
 public class Film {
     long id;

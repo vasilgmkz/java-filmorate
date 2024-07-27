@@ -1,67 +1,74 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+
 import jakarta.validation.Valid;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-
-import java.time.LocalDate;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.ValidateService;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
+
+@Slf4j
 @RestController
 @RequestMapping("/films")
-
+@AllArgsConstructor
 public class FilmController {
-    private static final Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(FilmController.class);
-    private final Map<Long, Film> films = new HashMap<>();
+
+    private final FilmService filmService;
+    private final ValidateService validateService;
 
     @GetMapping
     public Collection<Film> findAll() {
-        return films.values();
+        return filmService.findAll();
+    }
+    @GetMapping({"{id}"})
+    public Film getId(@PathVariable long id) {
+        return filmService.getId(id);
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        log.setLevel(Level.INFO);
-        filmValidation(film);
-        film.setId(getNextId());
-        films.put(film.getId(), film);
-        log.info("Фильм " + film.getName() + " успешно добавлен");
-        return film;
+        validateService.filmValidation(film);
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
-        log.setLevel(Level.INFO);
-        if (films.containsKey(film.getId())) {
-            filmValidation(film);
-            films.put(film.getId(), film);
-            log.info("Фильм " + film.getName() + " успешно обновлен");
-            return film;
+        validateService.filmValidation(film);
+        return filmService.update(film);
+    }
+    @PutMapping({"{filmId}/like/{userId}"})
+    public void addLikes(@PathVariable Map<String, String> pathVarsMap) {
+        try {
+            long filmId = Long.parseLong(pathVarsMap.get("filmId"));
+            long userId = Long.parseLong(pathVarsMap.get("userId"));
+            filmService.addLikes(filmId, userId);
+        } catch (NumberFormatException e) {
+            throw new ValidationException("Ошибка валидации. Не верный формат filmId или UserId");
         }
-        log.warn("Фильм с id " + film.getId() + " не найден");
-        throw new ValidationException("Фильм с id " + film.getId() + " не найден", "id");
     }
-
-    private long getNextId() {
-        long currentMaxId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    @DeleteMapping({"{filmId}/like/{userId}"})
+    public void deleteLikes(@PathVariable Map<String, String> pathVarsMap) {
+        try {
+            long filmId = Long.parseLong(pathVarsMap.get("filmId"));
+            long userId = Long.parseLong(pathVarsMap.get("userId"));
+            filmService.deleteLikes(filmId, userId);
+        } catch (NumberFormatException e) {
+            throw new ValidationException("Ошибка валидации. Не верный формат filmId или UserId");
+        }
     }
-
-    private void filmValidation(Film film) {
-        log.setLevel(Level.WARN);
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.warn("Дата релиза — не раньше 28 декабря 1895 года");
-            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года", "releaseDate");
+    @GetMapping({"/popular"})
+    public Collection<Film> popularFilms (@RequestParam(defaultValue = "10") String count) {
+        try {
+            long counts = Long.parseLong(count);
+            return filmService.popularFilms(counts);
+        } catch (NumberFormatException e) {
+            throw new ValidationException("Ошибка валидации. Не верный формат count");
         }
     }
 }
