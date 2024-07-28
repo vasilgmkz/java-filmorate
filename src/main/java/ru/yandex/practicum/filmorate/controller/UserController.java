@@ -1,68 +1,90 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+
 import jakarta.validation.Valid;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.ValidateService;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
+@AllArgsConstructor
 public class UserController {
-    private final Map<Long, User> users = new HashMap<>();
-    private static final Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(UserController.class);
+
+    private final UserService userService;
+    private final ValidateService validateService;
 
     @GetMapping
     public Collection<User> findAll() {
-        return users.values();
+        return userService.findAll();
+    }
+
+    @GetMapping("{id}")
+    public User getId(@PathVariable long id) {
+        return userService.getId(id);
     }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        log.setLevel(Level.INFO);
-        userValidation(user);
-        user.setId(getNextId());
-        users.put(user.getId(), user);
-        log.info("Пользователь " + user.getName() + " успешно добавлен");
-        return user;
+        validateService.userValidation(user);
+        return userService.create(user);
     }
 
     @PutMapping
     public User update(@Valid @RequestBody User user) {
-        log.setLevel(Level.INFO);
-        if (users.containsKey(user.getId())) {
-            userValidation(user);
-            users.put(user.getId(), user);
-            log.info("Пользователь " + user.getName() + " успешно обновлен");
-            return user;
-        }
-        log.warn("Пользователь с id " + user.getId() + " не найден");
-        throw new ValidationException("Пользователь с id " + user.getId() + " не найден", "id");
+        validateService.userValidation(user);
+        return userService.update(user);
     }
 
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    @PutMapping({"{id}/friends/{friendId}"})
+    public void addInFriend(@PathVariable Map<String, String> pathVarsMap) {
+        try {
+            long id = Long.parseLong(pathVarsMap.get("id"));
+            long friendId = Long.parseLong(pathVarsMap.get("friendId"));
+            userService.addInFriend(id, friendId);
+        } catch (NumberFormatException e) {
+            throw new ValidationException("Ошибка валидации. Не верный формат userId или friendId");
+        }
     }
 
-    private void userValidation(User user) {
-        log.setLevel(Level.WARN);
-        if ((user.getLogin().contains(" "))) {
-            log.warn("Логин не может содержать пробелы");
-            throw new ValidationException("Логин не может содержать пробелы", "login");
+    @DeleteMapping({"{id}/friends/{friendId}"})
+    public void deleteFromFriend(@PathVariable Map<String, String> pathVarsMap) {
+        try {
+            long id = Long.parseLong(pathVarsMap.get("id"));
+            long friendId = Long.parseLong(pathVarsMap.get("friendId"));
+            userService.deleteFromFriend(id, friendId);
+        } catch (NumberFormatException e) {
+            throw new ValidationException("Ошибка валидации. Не верный формат userId или friendId");
         }
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
+    }
+
+    @GetMapping({"{id}/friends"})
+    public List<User> getFriendsUser(@PathVariable("id") String userId) {
+        try {
+            long id = Long.parseLong(userId);
+            return userService.getFriendsUser(id);
+        } catch (NumberFormatException e) {
+            throw new ValidationException("Ошибка валидации. Не верный формат userId");
+        }
+    }
+
+    @GetMapping({"{id}/friends/common/{otherId}"})
+    public List<User> getCommonId(@PathVariable Map<String, String> pathVarsMap) {
+        try {
+            long id = Long.parseLong(pathVarsMap.get("id"));
+            long otherId = Long.parseLong(pathVarsMap.get("otherId"));
+            return userService.getCommonId(id, otherId);
+        } catch (NumberFormatException e) {
+            throw new ValidationException("Ошибка валидации. Не верный формат userId или otherId");
         }
     }
 }
