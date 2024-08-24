@@ -1,4 +1,19 @@
-package ru.yandex.practicum.filmorate.repository;
+//package ru.yandex.practicum.filmorate.repository;
+//
+//import lombok.RequiredArgsConstructor;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+//import org.springframework.context.annotation.Import;
+//import ru.yandex.practicum.filmorate.model.Film;
+//import ru.yandex.practicum.filmorate.model.Genre;
+//import ru.yandex.practicum.filmorate.model.Rating;
+//
+//import java.time.LocalDate;
+//
+//import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+//
 //@JdbcTest
 //@Import(JdbcFilmRepository.class)
 //@RequiredArgsConstructor(onConstructor_ = @Autowired)
