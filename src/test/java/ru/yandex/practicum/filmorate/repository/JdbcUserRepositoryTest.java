@@ -7,13 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.repository.mappers.UserResultSetExtractor;
+import ru.yandex.practicum.filmorate.repository.mappers.UsersResultSetExtractor;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @JdbcTest
-@Import(JdbcUserRepository.class)
+@Import({JdbcUserRepository.class, UsersResultSetExtractor.class, UserResultSetExtractor.class})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DisplayName("JdbcUserRepository")
 class JdbcUserRepositoryTest {

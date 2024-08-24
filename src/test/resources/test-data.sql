@@ -8,12 +8,7 @@ INSERT INTO Rating (rating_name)
 VALUES ('G');
 
 insert into FILMS (name, rating_id, description, releaseDate, duration)
-values ('name', 1, 'description', '2012-04-22', 200);
-
-CREATE TABLE IF NOT EXISTS FilmsGenres (
-film_id INTEGER REFERENCES FILMS(film_id),
-genre_id INTEGER REFERENCES GENRES(genre_id)
-);
+values ('name', 1, 'description', '2022-04-12', 200);
 
 insert into FilmsGenres (film_id, genre_id)
 values (1, 1);
