@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface GenreRepository {
-    public Set<Genre> getGenresById(List<Long> genres_id);
+    public Set<Genre> getGenresById(List<Long> genresId);
 
     public Genre getGenreId(long id);
 

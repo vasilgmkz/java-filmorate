@@ -22,11 +22,11 @@ public class JdbcGenreRepository implements GenreRepository {
 
 
     @Override
-    public Set<Genre> getGenresById(List<Long> genres_id) {
+    public Set<Genre> getGenresById(List<Long> genresId) {
         MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
         Set<Genre> genres = new LinkedHashSet<>();
-        for (long genre_id : genres_id) {
-            mapSqlParameterSource.addValue("genre_id", genre_id);
+        for (long genreId : genresId) {
+            mapSqlParameterSource.addValue("genre_id", genreId);
             Genre genre = jdbc.query("SELECT * FROM GENRES WHERE genre_id = :genre_id", mapSqlParameterSource, genreResultSetExtractor);
             if (genre.getId() == 0) {
                 throw new ValidationException("Ошибка валидации. Жанры не найдены");

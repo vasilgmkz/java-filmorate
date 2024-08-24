@@ -47,15 +47,15 @@ public class JdbcFilmRepository implements FilmRepository {
             film.setGenres(new LinkedHashSet<Genre>());
         }
         jdbc.update("INSERT INTO FILMS (name, description, releaseDate, duration, rating_id) VALUES (:name, :description, :releaseDate, :duration, :rating_id)", mapSqlParameterSource, keyHolder, new String[]{"film_id"});
-        Integer film_id = keyHolder.getKeyAs(Integer.class);
-        mapSqlParameterSource.addValue("film_id", film_id);
+        Integer filmId = keyHolder.getKeyAs(Integer.class);
+        mapSqlParameterSource.addValue("film_id", filmId);
         if (!genreId.isEmpty()) {
-            for (long genre_id : genreId) {
-                mapSqlParameterSource.addValue("genre_id", genre_id);
+            for (long genre : genreId) {
+                mapSqlParameterSource.addValue("genre_id", genre);
                 jdbc.update("INSERT INTO FilmsGenres (film_id, genre_id) VALUES (:film_id, :genre_id)", mapSqlParameterSource, keyHolder);
             }
         }
-        film.setId(film_id);
+        film.setId(filmId);
         film.getMpa().setName(rating.getName());
         return film;
     }
@@ -118,8 +118,8 @@ public class JdbcFilmRepository implements FilmRepository {
         jdbc.update("UPDATE FILMS SET NAME =:name, description = :description, releaseDate = :releaseDate, duration = :duration, rating_id = :rating_id  WHERE FILM_ID = :film_id", mapSqlParameterSource);
         jdbc.update("DELETE FROM FILMSGENRES WHERE FILM_ID =:film_id", mapSqlParameterSource);
         if (!genreIdUpdate.isEmpty()) {
-            for (long genre_id : genreIdUpdate) {
-                mapSqlParameterSource.addValue("genre_id", genre_id);
+            for (long genre : genreIdUpdate) {
+                mapSqlParameterSource.addValue("genre_id", genre);
                 jdbc.update("INSERT INTO FILMSGENRES (film_id, genre_id) VALUES (:film_id, :genre_id)", mapSqlParameterSource);
             }
         }
