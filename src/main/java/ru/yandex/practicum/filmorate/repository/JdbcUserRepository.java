@@ -31,8 +31,8 @@ public class JdbcUserRepository implements UserRepository {
         mapSqlParameterSource.addValue("email", user.getEmail());
         mapSqlParameterSource.addValue("birthday", java.sql.Date.valueOf(user.getBirthday()));
         jdbc.update("INSERT INTO Users (email, login, user_name, birthday) VALUES (:email, :login, :user_name, :birthday)", mapSqlParameterSource, keyHolder, new String[]{"user_id"});
-        Integer user_id = keyHolder.getKeyAs(Integer.class);
-        user.setId(user_id);
+        Integer userId = keyHolder.getKeyAs(Integer.class);
+        user.setId(userId);
         return user;
     }
 
