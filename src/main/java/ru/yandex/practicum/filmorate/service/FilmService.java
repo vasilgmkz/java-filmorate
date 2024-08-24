@@ -4,47 +4,61 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.repository.JdbcFilmRepository;
+import ru.yandex.practicum.filmorate.repository.JdbcUserRepository;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class FilmService {
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final JdbcFilmRepository jdbcFilmRepository;
+    private final JdbcUserRepository jdbcUserRepository;
 
-    public Collection<Film> findAll() {
-        return filmStorage.findAll();
+
+    public List<Film> getFilmAll() {
+        return jdbcFilmRepository.getFilmAll();
     }
 
-    public Film create(Film film) {
-        return filmStorage.create(film);
+    public Film save(Film film) {
+        return jdbcFilmRepository.save(film);
+    }
+
+    public Film getFilmId(long id) {
+        Film film = jdbcFilmRepository.getFilmId(id);
+        if (film == null) {
+            throw new NotFoundException("Фильм с id " + id + " не найден");
+        }
+        return film;
     }
 
     public Film update(Film film) {
-        filmStorage.getId(film.getId()).orElseThrow(() -> new NotFoundException("Фильм с id " + film.getId() + " не найден"));
-        return filmStorage.update(film);
+        return jdbcFilmRepository.update(film);
     }
 
-    public Film getId(long id) {
-        return filmStorage.getId(id).orElseThrow(() -> new NotFoundException("Фильм с id " + id + " не найден"));
-    }
 
     public void addLikes(long filmId, long userId) {
-        userStorage.getId(userId).orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
-        filmStorage.getId(filmId).orElseThrow(() -> new NotFoundException("Фильм с id " + filmId + " не найден"));
-        filmStorage.addLikes(filmId, userId);
+        if (jdbcFilmRepository.getFilmId(filmId) == null) {
+            throw new NotFoundException("Фильм с id " + filmId + " не найден");
+        }
+        if (jdbcUserRepository.getUserId(userId).getId() == 0) {
+            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+        }
+        jdbcFilmRepository.addLikes(filmId, userId);
     }
 
     public void deleteLikes(long filmId, long userId) {
-        userStorage.getId(userId).orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
-        filmStorage.getId(filmId).orElseThrow(() -> new NotFoundException("Фильм с id " + filmId + " не найден"));
-        filmStorage.deleteLikes(filmId, userId);
+        if (jdbcFilmRepository.getFilmId(filmId) == null) {
+            throw new NotFoundException("Фильм с id " + filmId + " не найден");
+        }
+        if (jdbcUserRepository.getUserId(userId).getId() == 0) {
+            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+        }
+        jdbcFilmRepository.deleteLikes(filmId, userId);
     }
 
     public Collection<Film> popularFilms(long count) {
-        return filmStorage.popularFilms(count);
+        return jdbcFilmRepository.popularFilms(count);
     }
 }
