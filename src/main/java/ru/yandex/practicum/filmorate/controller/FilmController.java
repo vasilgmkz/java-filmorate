@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.ValidateService;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 
@@ -24,19 +25,19 @@ public class FilmController {
     private final ValidateService validateService;
 
     @GetMapping
-    public Collection<Film> findAll() {
-        return filmService.findAll();
+    public List<Film> findAll() {
+        return filmService.getFilmAll();
     }
 
     @GetMapping({"{id}"})
     public Film getId(@PathVariable long id) {
-        return filmService.getId(id);
+        return filmService.getFilmId(id);
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         validateService.filmValidation(film);
-        return filmService.create(film);
+        return filmService.save(film);
     }
 
     @PutMapping
@@ -44,6 +45,7 @@ public class FilmController {
         validateService.filmValidation(film);
         return filmService.update(film);
     }
+
 
     @PutMapping({"{filmId}/like/{userId}"})
     public void addLikes(@PathVariable Map<String, String> pathVarsMap) {

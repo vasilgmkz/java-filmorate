@@ -1,4 +1,0 @@
-logging.level:
-  ru.yandex.practicum.filmorate: INFO
-  org.zalando.logbook: TRACE
-

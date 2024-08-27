@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.service.ValidateService;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +23,9 @@ public class UserController {
     private final ValidateService validateService;
 
     @GetMapping
-    public Collection<User> findAll() {
-        return userService.findAll();
+    public List<User> findAll() {
+        return userService.findAllUser();
+        //return userService.findAll();
     }
 
     @GetMapping("{id}")
@@ -36,7 +36,8 @@ public class UserController {
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         validateService.userValidation(user);
-        return userService.create(user);
+        //return userService.create(user);
+        return userService.save(user);
     }
 
     @PutMapping
